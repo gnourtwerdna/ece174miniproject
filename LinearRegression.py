@@ -34,6 +34,3 @@ class LinearRegression:
 
     def predict(self, X):
         return self.classifier(np.dot(X, self.model))
-
-    def accuracy_score(self, y_true, y_pred):
-        return np.mean(y_true == y_pred)

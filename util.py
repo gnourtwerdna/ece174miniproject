@@ -144,3 +144,12 @@ def generate_classifiers(num_classes):
     '''
     classes = range(num_classes)
     return list(combinations(classes, 2))
+
+def accuracy_score(y_true, y_pred):
+    return np.mean(y_true == y_pred)
+
+def error(y_true, y_pred):
+    return 1 - np.sum(y_true == y_pred)
+
+def error_rate(y_true, y_pred):
+    return error(y_true, y_pred) / len(y_true)
