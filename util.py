@@ -3,7 +3,6 @@ import numpy as np
 from scipy import optimize
 from itertools import combinations
 
-
 def load_data(path, train = True):
     '''
     Loads the MNIST data file.
@@ -35,7 +34,6 @@ def load_data(path, train = True):
     else:
         return (X_test, y_test.T)
 
-
 def normalize(X):
     '''
     Normalizes the data to 0-1.
@@ -50,7 +48,6 @@ def normalize(X):
 
     '''
     return X.astype('float32') / 255.0
-
 
 def generate_binary_dataset(images, labels, class1, class2):
     '''
@@ -81,7 +78,6 @@ def generate_binary_dataset(images, labels, class1, class2):
             
     return (x, y)
 
-
 def generate_binary_index(images, labels, class1, class2):
     '''
     Generates indexes where images are labeled as class 1 and class 2.
@@ -102,7 +98,6 @@ def generate_binary_index(images, labels, class1, class2):
 
     '''
     return np.where((labels == class1) | (labels == class2))[0]
-
 
 def onehot_encode(y, num_classes):
     '''
@@ -128,7 +123,6 @@ def onehot_encode(y, num_classes):
 
     return np.stack(y_one_hot, axis=0)
 
-
 def append_bias(X):
     """
     Append bias term for dataset. Essentially adds a column of 1's.
@@ -143,7 +137,6 @@ def append_bias(X):
     """
     bias = np.ones([X.shape[0], 1])
     return np.append(bias, X, axis = 1)
-
 
 def generate_classifiers(num_classes):
     '''

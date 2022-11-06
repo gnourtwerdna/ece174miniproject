@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def binary(X):
     '''
     Binary classifier that calculates the sign of the input.
@@ -14,7 +13,6 @@ def one_vs_rest(X):
 
     '''
     return np.argmax(X, axis = 1).reshape((len(X), 1))
-
 
 class LinearRegression:
     def __init__(self, method):
