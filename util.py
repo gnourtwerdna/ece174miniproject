@@ -1,24 +1,12 @@
 import scipy.io as sio
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy import optimize
 from itertools import combinations
 
 def load_data(path, train = True):
     '''
-    Loads the MNIST data file.
-
-    Parameters
-    ----------
-    path : string
-        path to the data
-
-    type : string
-        indicates what type of data to load, 'train' or 'test'
-
-    Returns
-    -------
-    tuple containing dataset in (data, label) format
-
+    Loads the MNIST data mat file.
     '''
     mat_contents = sio.loadmat(path)
 
@@ -36,39 +24,15 @@ def load_data(path, train = True):
 
 def normalize(X):
     '''
-    Normalizes the data to 0-1.
-
-    Parameters
-    ----------
-    X : N x d array
-
-    Returns
-    -------
-    normalized input
-
+    Returns dataset with data normalized from 0 to 1.
     '''
     return X.astype('float32') / 255.0
 
 def generate_binary_dataset(images, labels, class1, class2):
     '''
-    Generates dataset with two classes
-
-    Parameters
-    ----------
-    images : array
-        N x d array containing images
-    labels: array
-        d x 1 array containging labels
-
-    class : int
-        input desired classes
-
-    Returns
-    -------
-    tuple containing dataset in (data, label) format
-
+    Returns dataset with two classes
     '''
-    idx = generate_binary_index(images, labels, class1, class2)
+    idx = generate_binary_index(labels, class1, class2)
 
     x = images[idx]
     y = labels[idx]
@@ -78,42 +42,15 @@ def generate_binary_dataset(images, labels, class1, class2):
             
     return (x, y)
 
-def generate_binary_index(images, labels, class1, class2):
+def generate_binary_index(labels, class1, class2):
     '''
-    Generates indexes where images are labeled as class 1 and class 2.
-
-    Parameters
-    ----------
-    images : array
-        N x d array containing images
-    labels: array
-        d x 1 array containging labels
-
-    class : int
-        input desired classes
-
-    Returns
-    -------
-    tuple containing dataset in (data, label) format
-
+    Returns indexes where images are labeled as class 1 and class 2.
     '''
     return np.where((labels == class1) | (labels == class2))[0]
 
 def onehot_encode(y, num_classes):
     '''
-    Does one hot encoding on y.
-
-    Parameters
-    ----------
-    y : array
-        d x 1 array containging labels
-    num_classes: int
-        number of classes in labels
-
-    Returns
-    -------
-    one hot encoded array
-
+    Returns one hot encoded labels.
     '''
     y_one_hot = []
     for i in range(len(y)):
@@ -123,33 +60,66 @@ def onehot_encode(y, num_classes):
 
     return np.stack(y_one_hot, axis=0)
 
-def append_bias(X):
+def append_bias(X, random = False):
     """
-    Append bias term for dataset. Essentially adds a column of 1's.
-
-    Parameters
-    ----------
-    X
-        2d numpy array with shape (N,d)
-    Returns
-    -------
-        2d numpy array with shape (N,(d+1))
+    Returns dataset with bias appended. If random=false, will append a column of 1's. If random=true, will append a column of numbers from 0 to 1.
     """
-    bias = np.ones([X.shape[0], 1])
-    return np.append(bias, X, axis = 1)
+    if random == False:
+        bias = np.ones([X.shape[0], 1])
+        return np.append(bias, X, axis = 1)
+    if random == True:
+        bias = np.random.random([X.shape[0], 1])
+        return np.append(bias, X, axis = 1)
 
 def generate_classifiers(num_classes):
     '''
-    Generates N(N-1)/2 combinations of classes.
+    Returns N(N-1)/2 combinations of classes.
     '''
     classes = range(num_classes)
     return list(combinations(classes, 2))
 
-def accuracy_score(y_true, y_pred):
-    return np.mean(y_true == y_pred)
-
 def error(y_true, y_pred):
-    return 1 - np.sum(y_true == y_pred)
+    '''
+    Returns the error.
+    '''
+    return len(y_true) - np.sum(y_true == y_pred)
 
 def error_rate(y_true, y_pred):
+    '''
+    Returns the error rate.
+    '''
     return error(y_true, y_pred) / len(y_true)
+
+def confusion_matrix(y_true, y_pred, num_classes):
+    '''
+    Returns confusion matrix
+    '''
+    confusion_matrix = np.zeros((num_classes, num_classes))
+    for i in range(y_true.shape[0]):
+        confusion_matrix[int(y_true[i][0])][int(y_pred[i][0])] += 1
+    return confusion_matrix
+
+def plot_confusion_matrix(cm, title):
+    '''
+    Plots confusion matrix.
+    '''
+    figsize = (7 , 7)
+    fig , ax = plt.subplots(figsize = figsize)
+    ax.matshow(cm, cmap = plt.cm.Blues)
+
+    for (i, j), value in np.ndenumerate(cm.astype(int)):
+        ax.text(j, i, value, ha='center', va='center')
+
+    ax.set(title = title, xlabel = 'Predicted Label', ylabel = 'True Label')
+
+def identity(x):
+    return x
+
+def sigmoid(x):
+    return 1/(1 + np.exp(-x))
+
+def sinusoidal(x):
+    return np.sin(x)
+
+def ReLU(x):
+    return np.maximum(x, 0)
